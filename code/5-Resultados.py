@@ -1,11 +1,5 @@
 
-# coding: utf-8
-
-# # Análisis de Resultados (Generales)
-
-# In[1]:
-
-
+# LIBRERIAS
 import numpy as np
 import datetime
 from datetime import date
@@ -24,15 +18,12 @@ matplotlib.pyplot.switch_backend('agg')
 plt.switch_backend('agg')
 #import matplotlib.pylab as plt
 
-# In[2]:
 
-
+# ARCHIVO DE CONFIGURACION
 import configparser
 Config = configparser.ConfigParser()
 Config.read("Config.conf")
-
-
-# In[3]:
+Config.sections()
 
 
 def ConfigSectionMap(section):
@@ -49,80 +40,63 @@ def ConfigSectionMap(section):
     return dict1
 
 
-print("Iniciando..")
-# ## Cargamos Data
 
-# In[4]:
+# RUTAS
+path_out=ConfigSectionMap("ruta")['salidas']
+nombre = ConfigSectionMap("file")['data'][:-4]
 
+# RUTAS DE ARCHIVOS ENTRADAS 
+footprint="%s%s.footprint" %(path_out,nombre)
+individual_clusters="%s%s.individual_footprint.clusters" %(path_out,nombre)
+individual_labels="%s%s.individual_footprint.labels" %(path_out,nombre)  
+collective_clusters="%s%s.collective_footprint.clusters" %(path_out,nombre)
+collective_labels="%s%s.collective_footprint.labels" %(path_out,nombre)  
+path_res = "%s%s_results.csv" %(path_out,nombre)  
 
-path_res = ConfigSectionMap("f4")['union'] #path file
-print("Path",path_res)
+# CARGANDO FILE
+print("Loading Data ...")
 result = pd.read_csv(path_res, sep=",", header=0,  dtype={'week': str,'year': str}, low_memory=False)
 print("Datos Cargados ..")
 print(len(result))
 result.head(5)
 
-
-# ### Variables de Apoyo - Clientes
-
-# In[5]:
-
-
+# Variables de Apoyo - Clientes
 clientes = result.CO_ID.unique()      # Lista de Clientes
 
 
-# In[6]:
+# DISTRIBUCION DE CLIENTES POR CLUSTER
 
+# Por Cluster Collectivo
+print("1th plot ...")
 
-#  pip install plotly
-
-
-# ## Distribución de Clientes por Cluster
-
-# #### Por Cluster Collectivo
-
-# In[7]:
-
-
-print("Primer plot ...")
-#   -------------------------------------------------------------------------------------------------
 temporal= result.groupby(['COLLECTIVE_CLUSTER'], as_index=False, sort=True)['CO_ID'].count()
-
 print("=>  ",str(len(temporal))," clusters")
-
 fig = plt.figure()
 fig.patch.set_alpha(0.5)
 ax = fig.add_subplot(111)
 ax.patch.set_alpha(0.5)
-
 data = ax.bar(temporal.index, temporal['CO_ID'], align='center')
 ax.grid(color='gray', linestyle='--', linewidth=1)
-
 ax.set_xlabel('Cluster Colectivo')
 ax.set_xticks(temporal.index)
-
 ax.set_ylabel('Número de Comportamiento')
 tag =[]
 for j in range(len(temporal)):
- nn = 'C '+ str(j)+''
- tag.append(nn)
- del(nn)
-
+    nn = 'C '+ str(j)+''
+    tag.append(nn)
+del(nn)
 ax.set_xticklabels(tag, rotation=70)
-
-
-
 title = "Distribición de Clusters"
-ax.set_title(title,)
-# plt.show()
-plt.savefig("./resultados/Collective_Clusters1.png",dpi = 1000)
+ax.set_title(title)
+grafico="%s%s_Collective_Clusters.png" %(path_out,nombre)
+plt.savefig(grafico,dpi = 1000, bbox_inches='tight')
+del(grafico)
 del(temporal)
 print('Done')
 
 
-# #### Por Cluster  Individual
+# Por Cluster  Individual
 print("Segundo Plot ...")
-# In[8]:
 
 
 def autolabel(rects):
@@ -138,19 +112,13 @@ def autolabel(rects):
 
 #   -------------------------------------------------------------------------------------------------
 temporal= result.groupby(['INDIVIDUAL_CLUSTER'], as_index=False, sort=True)['CO_ID'].count()
-
 print("=>  ",str(len(temporal))," clusters")
-#fig, ax = plt.subplots()
-
 fig = plt.figure(figsize=(15,5))
 ax = fig.add_subplot(111, frameon=True)
-
 data = ax.bar(temporal.index, temporal['CO_ID'], align='center')
 ax.grid(color='gray', linestyle='--', linewidth=1)
-
 ax.set_xlabel('Cluster Individual')
 ax.set_xticks(temporal.index)
-
 ax.set_ylabel('Número de Comportamiento')
 tag =[]
 for j in range(len(temporal)):
@@ -159,21 +127,17 @@ for j in range(len(temporal)):
     del(nn)
 
 ax.set_xticklabels(tag, rotation=70)
-
 autolabel(data)
-
 title = "Distribición de Cluster"
 ax.set_title(title)
-# plt.show()
-plt.savefig("./resultados/Individual_Clusters1.png",dpi = 1000)
+grafico="%s%s_Individual_Clusters.png" %(path_out,nombre)
+plt.savefig(grafico,dpi = 1000, bbox_inches='tight')
+del(grafico)
 del(temporal)
 print('Done')
 
 
-# ## Clusters Individual por collectivo
-
-# In[9]:
-
+# CLUSTERS INDIVIDUALES PER COLLECTIVES
 
 # matrix of clusters
 
@@ -188,29 +152,15 @@ for x in temporal.COLLECTIVE_CLUSTER.unique():
         matrix[x][i]=a[i]
     del(a,temporal_i)
 temporal = pd.DataFrame(matrix)
-matrix
-# temporal['total']=temporal.iloc[:,:].sum(axis=1)
-temporal.head()
-#temporal
+# temporal.head()
 
-
-# ### Variables de Apoyo - Planes
-
-# In[10]:
-
-
+# Variables de Apoyo - Planes
 H = matrix
-
 fig = plt.figure(figsize=(10, 30))
-
 ax = fig.add_subplot(111)
 ax.set_title('colorMap')
-
 im = plt.imshow(H, cmap="Blues")
-
-# plt.imshow(H)
 ax.set_aspect('equal')
-
 
 for i in range(len(temporal)):
     for j in range(len(temporal.iloc[1])):
@@ -221,14 +171,12 @@ ax.get_yaxis().set_visible(True)
 ax.patch.set_alpha(0)
 ax.set_frame_on(True)
 plt.colorbar(orientation='vertical')
-plt.savefig("./resultados/Coll_Ind_Clusters.jpg",dpi = 1000)
-# plt.show()
+grafico="%s%s_Both_Clusters.png" %(path_out,nombre)
+plt.savefig(grafico,dpi = 1000, bbox_inches='tight')
+del(grafico)
 
 
-# ## Comportamiento de los clusters en el Tiempo
-
-# In[25]:
-
+# Comportamiento de los clusters en el Tiempo
 
 from datetime import datetime
 def fromisocalendar(y,w,d):
@@ -287,15 +235,15 @@ ax.set_title(title)
 ax.set_xlabel('Año - Semana (Fecha)', bbox=box)
 ax.set_ylabel('Cantidad de Clientes', bbox=box)
 
-plt.savefig("./resultados/Collective_Clusters_Time1.png",dpi = 1000)
+grafico="%s%s_Collective_Clusters_Time.png" %(path_out,nombre)
+plt.savefig(grafico,dpi = 1000, bbox_inches='tight')
+del(grafico)
+
 del(temporal,helper)
 print('Done')
 
 
-# ## Distribucion de Semanas con "n" Clientes
-
-# In[21]:
-
+# Distribucion de Semanas con "n" Clientes
 
 temp= result.groupby(['PROFILE_ID'], as_index=False, sort=True)['CO_ID'].count()
 
@@ -320,8 +268,9 @@ ax.set_xticklabels(tag, rotation=80)
 
 title = "Semanas en las que hay clientes "
 ax.set_title(title)
-# plt.show()
-plt.savefig("./resultados/Actividades_Clientes_time1.png",dpi = 1000)
+grafico="%s%s_Actividades_Clientes_time.png" %(path_out,nombre)
+plt.savefig(grafico,dpi = 1000, bbox_inches='tight')
+del(grafico)
 del(temp)
 print('Done')
 
@@ -353,29 +302,21 @@ ax.set_xticklabels(tag, rotation=80)
     """
 title = "Histograma "
 ax.set_title(title)
-
-plt.savefig("./resultados/Frecuencia_Cliente1.png",dpi = 1000)
+grafico="%s%s_Frecuencia_Cliente.png" %(path_out,nombre)
+plt.savefig(grafico,dpi = 1000, bbox_inches='tight')
+del(grafico)
 #plt.show()
 del(temp)
 print('Done')
 
 
-# ## Centroides
-
-# In[14]:
-
-
+# CARGANDO CENTROIDES
 # Abrimos el File para cargar los centroides
-path_res = path_res = ConfigSectionMap("f3")['cc_cluster']
-centroides = pd.read_csv(path_res, sep=";", header=0,  dtype={'WEEK': str,'YEAR': str})
+centroides = pd.read_csv(collective_clusters, sep=";", header=0,  dtype={'WEEK': str,'YEAR': str})
 
 
-# ### Seleccionamos Centroide o cluster deseado
-
-# In[15]:
-
-
-num_cluster = int(ConfigSectionMap("f5")['center'])
+# Seleccionamos Centroide o cluster deseado
+num_cluster = int(ConfigSectionMap("detalles")['centroide'])
 # extraemos
 centroides_i = centroides[(centroides.COLLECTIVE_CLUSTER == num_cluster)]
 centroides_i
@@ -494,4 +435,7 @@ divider3 = make_axes_locatable(ax3)
 cax3 = divider3.append_axes("right", size="10%", pad=0.05)
 cbar3 = plt.colorbar(im3, cax=cax3)
 ax3.xaxis.set_visible(True)
-plt.savefig("./resultados/Centroide_i1.png",dpi = 1000)
+
+grafico="%s%s_Centroide_%s.png" %(path_out,nombre,num_cluster)
+plt.savefig(grafico,dpi = 1000, bbox_inches='tight')
+del(grafico)

@@ -10,6 +10,7 @@ import pylab as plt
 import datetime
 import pandas as pd
 from matplotlib.ticker import FormatStrFormatter
+import os
 
 
 # ARCHIVO DE CONFIGURACION
@@ -40,6 +41,13 @@ path_out=ConfigSectionMap("ruta")['salidas']
 conf_header=ConfigSectionMap("file")['header']
 conf_data= ConfigSectionMap("file")['data']
 nombre = conf_data[:-4]
+
+file_path = "../resultados/"
+directory = os.path.dirname(file_path)
+try:
+    os.stat(directory)
+except:
+    os.mkdir(directory)  
 
 # RUTAS DE ARCHIVOS ENTRADAS 
 p_header="%s%s" %(path_in,conf_header)
