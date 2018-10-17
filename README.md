@@ -1,6 +1,5 @@
-# Descubriendo Patrones de Comportamiento Temporal
+# Descubriendo Patrones de Comportamiento en Consumos de Datos
 
-Analizamos las `TXs - VS` en un distrito de Lima -`sjl` y construimos clusters de comportamiento semana del consumidor, por cada  `MCCG`.
 
 
 ## Details
