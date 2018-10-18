@@ -44,9 +44,14 @@ def ConfigSectionMap(section):
 
 # RUTAS
 path_out=ConfigSectionMap("ruta")['salidas']
+path_in=ConfigSectionMap("ruta")['entradas']
+conf_header=ConfigSectionMap("file")['header']
 nombre = ConfigSectionMap("file")['data'][:-4]
 
+
 # RUTAS DE ARCHIVOS ENTRADAS 
+p_header="%s%s" %(path_in,conf_header)
+
 footprint="%s%s.footprint" %(path_out,nombre)
 individual_clusters="%s%s.individual_footprint.clusters" %(path_out,nombre)
 individual_labels="%s%s.individual_footprint.labels" %(path_out,nombre)  
@@ -56,6 +61,7 @@ path_res = "%s%s_results.csv" %(path_out,nombre)
 
 # CARGANDO FILE
 print("Loading Data ...")
+header = pd.read_csv(p_header)
 result = pd.read_csv(path_res, sep=",", header=0,  dtype={'week': str,'year': str}, low_memory=False)
 print("Datos Cargados ..")
 print(len(result))
@@ -332,7 +338,8 @@ datos = centroides_i.iloc[:,1:].values
 datos = datos[0]
 turnos = ["Mad", "Mañ", "Tar", "Noc"]
 dias = ["L", "M", "M", "J", "V", "S", "D"]
-
+planes_tag = header.columns
+planes_tag = planes_tag[6:len(planes_tag)]
 
 # In[17]:
 
@@ -375,7 +382,7 @@ box = dict(facecolor='#ff9999', pad=4, alpha=0.2)
 fig, axes = plt.subplots(3, 1, figsize=(15,30))
 #fig, axes = plt.subplots(3, 1)
 ax1, ax2 , ax3= axes.flatten()
-plt.subplots_adjust(top=0.8, bottom=0.5, left=0.10, right=0.95, hspace=0.4, wspace=0.3)
+plt.subplots_adjust(top=0.8, bottom=0.5, left=0.10, right=0.95, hspace=0.5, wspace=0.1)
 
 title_i = "Centroide"+str(num_cluster)
 plt.title(title_i)
@@ -400,6 +407,7 @@ im2 = ax2.imshow(tm, cmap="YlGn")
 ax2.set_xticks(np.arange(38))
 ax2.set_yticks(np.arange(len(turnos)))
 ax2.set_xticklabels(range(38))
+ax2.set_xticklabels(planes_tag, rotation=70)
 ax2.set_yticklabels(turnos)
 for i in range(len(turnos)):
     for j in range(38):
@@ -416,6 +424,7 @@ im3 = ax3.imshow(dm, cmap="YlGn")
 ax3.set_xticks(np.arange(38))
 ax3.set_yticks(np.arange(len(dias)))
 ax3.set_xticklabels(range(38))
+ax3.set_xticklabels(planes_tag, rotation=70)
 ax3.set_yticklabels(dias)
 for i in range(len(dias)):
     for j in range(38):

@@ -83,7 +83,7 @@ def procesar_u(user, tipo_eth = False):
             anni[año][week] = {}
         # Si el billcycle no existe en la semana y año
         if not (weekday in anni[año][week]):
-            anni[año][week][weekday]={}  #NUMERO DE MCCGs VARIABLES
+            anni[año][week][weekday]={}  #
         # Si el turno no existe en el mccg,semana y año
         
         anni[año][week][weekday][turn]=list(user.iloc[dat,6:-1]) 
