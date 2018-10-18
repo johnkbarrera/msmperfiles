@@ -8,7 +8,7 @@ import pylab
 import pandas as pd
 import matplotlib.pyplot as plt
 import os, sys
-
+from progress.bar import Bar
 
 # ARCHIVO DE CONFIGURACION
 import configparser
@@ -56,7 +56,7 @@ data.head()
 
 # DEFINIMOS LA LISTA DE CLIENTES
 clientes =  data.groupby('CO_ID').CO_ID.count().index
-print("Numero de Clientes: ",len(clientes))
+print("Number of clients: ",len(clientes))
 
 #  DEFININIMOS FUNCION PROCESAR_U 
 def procesar_u(user, tipo_eth = False):    
@@ -83,7 +83,7 @@ def procesar_u(user, tipo_eth = False):
             anni[año][week] = {}
         # Si el billcycle no existe en la semana y año
         if not (weekday in anni[año][week]):
-            anni[año][week][weekday]={}  #
+            anni[año][week][weekday]={}  #NUMERO DE MCCGs VARIABLES
         # Si el turno no existe en el mccg,semana y año
         
         anni[año][week][weekday][turn]=list(user.iloc[dat,6:-1]) 
@@ -93,18 +93,16 @@ def procesar_u(user, tipo_eth = False):
 
 # PROCESAMOS U DE CADA CLIENTE    
 profiles={}           # Creamos lista de prefiles
-contador=0 
-print("Number of rows "+str(len(data))) 
+print("Number of Rows "+str(len(data))) 
 
 # Para cada cliente
+bar = Bar('Processing Clients', max=len(clientes))
 for cliente in clientes:
     cliente_i= data[data['CO_ID'] == cliente]       # filtramos dataset solo para el cliente i
     results=procesar_u(cliente_i, tipo_eth=False)          # procesamos u del usuario i
     profiles[results[0]]=results[1]                     # cargamos lista de indice "uid" con la data del cliente(json)
-    contador += 1
-    if contador % 5000 == 1:
-        print("vamos en el cliente ",contador)
-
+    bar.next()
+bar.finish()
 
 # Creamos la cabecera dinámica donde se guardaran todos los footprints generados
 cabecera = 'CO_ID,YEAR,WEEK,PROFILE_ID,SIZE'
@@ -120,8 +118,8 @@ individual_footprint="%s%s.footprint" %(path_out,nombre)
 
 
 # GUARDANDO ARCHIVOS
+print ("Saving file ...")
 fw=open(individual_footprint,'w')  
-
 fw.write(cabecera)                    # Escribimos la cabecera
 
 # Para cada uid (cliente)
@@ -154,9 +152,6 @@ for uid in profiles:
             
     fw.flush()
 fw.close()               
-print ("number of footprint: "+str(footprints))
-
-
-
+print ("Number of Footprint: "+str(footprints))
 print("Done")
 

@@ -4,8 +4,14 @@ import numpy as np
 import json
 import pylab
 import pandas as pd
-import  matplotlib.pylab as plt
 import os, sys
+from progress.bar import Bar
+
+import matplotlib
+# matplotlib.use('agg')
+import pylab as plt
+matplotlib.pyplot.switch_backend('agg')
+plt.switch_backend('agg')
 
 # ARCHIVO DE CONFIGURACION
 import configparser
@@ -168,7 +174,7 @@ def closest_point_on_segment(a, b, p):
         closest_point = [cp_x, cp_y]
 
     return closest_point
-	
+    
 
 
 # CLUSTERS INDIVIDUALES
@@ -182,7 +188,7 @@ def process_data(to_cluster):
     y=[K[k]['inertia'] for k in K]
     best_k=compute_best_k(x,y,len(to_cluster))
     
-    print(str(contador)+' => clustering: '+str(clientes[n_cliente])+' len data: '+str(len(data))+" best k: "+str(best_k))
+    # print(str(contador)+' => clustering: '+str(clientes[n_cliente])+' len data: '+str(len(data))+" best k: "+str(best_k))
 
     # clustering
     if best_k==1:
@@ -225,6 +231,7 @@ n_cliente=0           # Indica el nuemro del cliente que estamos reccoriendo
 contador = 0          # Indica en número de registro en el que estamos
 data=[]             # buffer vacio
 
+bar = Bar('Processing footprints', max=num_rows)
 # Reading individual footprint (line to line)
 for row in f:
     row=row.strip().split(',') # leemos cada elemento de la linea parseada por ","
@@ -305,7 +312,8 @@ for row in f:
         fw2.flush()
         #---------------------------------------------------------------------
         #---------------------------------------------------------------------
-
+    bar.next()
+bar.finish()
 fw.close()
 fw2.close() 
 print('Done')            
@@ -353,16 +361,19 @@ import pickle
 # get_ipython().run_line_magic('matplotlib', 'inline')
 x=sorted(K.keys())
 y=[K[k]['inertia'] for k in x]
-best_k = compute_best_k(x,y,len(to_cluster))
-
+# best_k = compute_best_k(x,y,len(to_cluster))
+best_k,plt=compute_best_k(x,y,len(to_cluster),plot=True,points=1000)
 print(best_k)
 # best_k=2 #a mano
-# plt.title("Collective clustering",fontsize=16)
-# plt.ylabel("SSE",fontsize=16)
-# plt.xlabel("K",fontsize=16)
-# plt.tight_layout()
-# plt.show()
-# pylab.savefig('%s.png' %(raw_data),dpi=200)
+plt.title("Collective clustering",fontsize=16)
+plt.ylabel("SSE",fontsize=16)
+plt.xlabel("K",fontsize=16)
+plt.tight_layout()
+plt.show()
+grafico="%s%s_Best_Collective_K.png" %(path_out,nombre)
+plt.savefig(grafico,dpi = 1000, bbox_inches='tight')
+del(grafico)
+
 
 import pandas as pd
 df_sse=pd.DataFrame([x,y]).T
