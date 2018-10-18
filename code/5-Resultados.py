@@ -4,20 +4,20 @@ import numpy as np
 import datetime
 from datetime import date
 import json
-import pylab
+# import pylab
 import pandas as pd
 import os, sys
 from sklearn.preprocessing import normalize
 
-import matplotlib.pylab as plt
-#import matplotlib
-#matplotlib.use('Agg')
-#import pylab as plt
+# import matplotlib.pylab as plt
+import matplotlib
+matplotlib.use('agg')
+import pylab as plt
 
-#matplotlib.pyplot.switch_backend('agg')
+matplotlib.pyplot.switch_backend('agg')
 
-#plt.switch_backend('agg')
-#import matplotlib.pylab as plt
+plt.switch_backend('agg')
+# import matplotlib.pylab as plt
 
 
 # ARCHIVO DE CONFIGURACION
