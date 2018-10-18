@@ -10,13 +10,13 @@ import os, sys
 from sklearn.preprocessing import normalize
 
 # import matplotlib.pylab as plt
-import matplotlib
-matplotlib.use('Agg')
-import pylab as plt
+#import matplotlib
+#matplotlib.use('Agg')
+#import pylab as plt
 
-matplotlib.pyplot.switch_backend('agg')
-plt.switch_backend('agg')
-#import matplotlib.pylab as plt
+#matplotlib.pyplot.switch_backend('agg')
+#plt.switch_backend('agg')
+import matplotlib.pylab as plt
 
 
 # ARCHIVO DE CONFIGURACION
@@ -366,16 +366,7 @@ for m in range(38):
             contador += 1
 
 
-# In[18]:
-
-
-td
-
-
-# ### Plot de centroide i
-
-# In[24]:
-
+# Plot de centroide i
 
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 box = dict(facecolor='#ff9999', pad=4, alpha=0.2)
