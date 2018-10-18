@@ -74,7 +74,7 @@ clientes = result.CO_ID.unique()      # Lista de Clientes
 # DISTRIBUCION DE CLIENTES POR CLUSTER
 
 # Por Cluster Collectivo
-print("1th plot ...")
+print(" 1th plot ...")
 
 temporal= result.groupby(['COLLECTIVE_CLUSTER'], as_index=False, sort=True)['CO_ID'].count()
 print("=>  ",str(len(temporal))," clusters")
@@ -103,8 +103,7 @@ print('Done')
 
 
 # Por Cluster  Individual
-print("Segundo Plot ...")
-
+print(" 2th Plot ...")
 
 def autolabel(rects):
     """
@@ -146,6 +145,7 @@ print('Done')
 
 # CLUSTERS INDIVIDUALES PER COLLECTIVES
 
+print(" 3th Plot ...")
 # matrix of clusters
 
 temporal= result.groupby(['COLLECTIVE_CLUSTER','INDIVIDUAL_CLUSTER'], as_index=False, sort=True)['CO_ID'].count()
@@ -181,9 +181,10 @@ plt.colorbar(orientation='vertical')
 grafico="%s%s_Both_Clusters.png" %(path_out,nombre)
 plt.savefig(grafico,dpi = 1000, bbox_inches='tight')
 del(grafico)
-
+print('Done')
 
 # Comportamiento de los clusters en el Tiempo
+print(" 4th plot ...")
 
 from datetime import datetime
 def fromisocalendar(y,w,d):
@@ -221,7 +222,7 @@ for j, n in enumerate(sorted(overlap, reverse=True)):
     cor = mcd.XKCD_COLORS[n].upper()
     colores[j] = cor
 
-legend = ax.legend(loc='upper center', shadow=True, fontsize='x-large')
+#legend = ax.legend(loc='upper center', shadow=True, fontsize='x-large')
 
 from datetime import datetime
 
@@ -236,7 +237,7 @@ for k in range(longitud):
 
 
 
-ax.legend()
+ax.legend(loc='upper right', shadow=True, fontsize='x-small')
 title = 'Variación en el Tiempo del Comportamiento de los Clientes (Cluster collectivo)'
 ax.set_title(title)
 ax.set_xlabel('Año - Semana (Fecha)', bbox=box)
@@ -251,6 +252,7 @@ print('Done')
 
 
 # Distribucion de Semanas con "n" Clientes
+print(" 5th plot ...")
 
 temp= result.groupby(['PROFILE_ID'], as_index=False, sort=True)['CO_ID'].count()
 
@@ -282,8 +284,8 @@ del(temp)
 print('Done')
 
 
-# In[22]:
-
+# Frecuencia  de clientes en cada semana
+print(" 6th plot ...")
 
 temp = result.groupby(['CO_ID'], as_index=False, sort=True)['SIZE'].count()
 temp = temp.groupby(['SIZE'], as_index=False, sort=True).count()
@@ -318,6 +320,8 @@ print('Done')
 
 
 # CARGANDO CENTROIDES
+
+print(" 7th plot ...")
 # Abrimos el File para cargar los centroides
 centroides = pd.read_csv(collective_clusters, sep=";", header=0,  dtype={'WEEK': str,'YEAR': str})
 
@@ -440,3 +444,4 @@ ax3.xaxis.set_visible(True)
 grafico="%s%s_Centroide_%s.png" %(path_out,nombre,num_cluster)
 plt.savefig(grafico,dpi = 1000, bbox_inches='tight')
 del(grafico)
+print('Done')
